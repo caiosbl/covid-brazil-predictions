@@ -4,7 +4,7 @@ Predictions to Covid-19 in Brazil
 
 ## Installation
 
-pip3 install requirements.txt
+```pip3 install requirements.txt```
 
 
 ## Usage
