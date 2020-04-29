@@ -15,4 +15,4 @@ pip3 install requirements.txt
 Special Thanks to [João Henrique](https://github.com/joaohenriquedss) that elaborate the prediction model.
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+[GNU](https://github.com/caiosbl/covid-brazil-predictions/blob/master/LICENSE)
