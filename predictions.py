@@ -2,22 +2,15 @@ import pandas as pd
 from fbprophet import Prophet
 from flask import Flask
 from flask import jsonify
+from timeloop import Timeloop
+from datetime import timedelta
 import threading
 import datetime
 
 
 app = Flask(__name__)
+covid_data = pd.read_csv('http://coronavairus.herokuapp.com/brazil/csv') 
 
-covid_data = pd.read_csv('http://coronavairus.herokuapp.com/brazil/csv') # dataset
-
-
-def set_interval(func, sec):
-    def func_wrapper():
-        set_interval(func, sec)
-        func()
-    t = threading.Timer(sec, func_wrapper)
-    t.start()
-    return t
 
 def normalizer_date(date):
     result = ''
@@ -30,7 +23,6 @@ def normalizer_results(num):
     return result
 
 def to_obj(cases,deaths):
-
 
     data_res = []
 
@@ -53,7 +45,7 @@ def to_obj(cases,deaths):
     return data_res
 
 
-def predicao(covid_data):
+def get_predict(covid_data):
   covid_data['date'] = covid_data.date.apply(normalizer_date)
   covid_data['date'] = pd.to_datetime(covid_data['date'])
 
@@ -92,15 +84,32 @@ def predicao(covid_data):
   
   return {"cases": data_cases, "deaths": data_deaths}
 
-pred = predicao(covid_data)
 
+predict_data = get_predict(covid_data)
+last_fetch = datetime.datetime.now()
 
+tl = Timeloop()
+
+@tl.job(interval=timedelta(minutes=30))
+def update_data():
+    global last_fetch
+    global predict_data
+    global covid_data
+    covid_data = pd.read_csv('http://coronavairus.herokuapp.com/brazil/csv') 
+    predict_data = get_predict(covid_data)
+    last_fetch = datetime.datetime.now()
 
 @app.route("/")
 def res():
-  
-   return {'data': to_obj(pred['cases'],pred['deaths'])}
+    global last_data
+    global predict_data
 
+    return {'data': to_obj(predict_data['cases'],predict_data['deaths']), 'last_fetch': last_fetch}
 
-if __name__ == '__main__':
+@tl.job(interval=timedelta(seconds=0))
+def run_server():
     app.run(debug=False)
+
+
+if __name__ == "__main__":
+    tl.start(block=True)
