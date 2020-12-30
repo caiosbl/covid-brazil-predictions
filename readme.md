@@ -12,7 +12,7 @@ Predictions to Covid-19 in Brazil
 ```python3 predictions.py```
 
 ## Special Thanks
-Special Thanks to [João Henrique](https://github.com/joaohenriquedss) that elaborate the prediction model.
+Special Thanks to [João Henrique](https://github.com/joaohenriquedss).
 
 ## License
 [GNU](https://github.com/caiosbl/covid-brazil-predictions/blob/master/LICENSE)
